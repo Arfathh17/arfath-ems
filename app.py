@@ -269,4 +269,4 @@ if __name__ == "__main__":
     print("\n  ✅  EMS running → http://127.0.0.1:5000\n")
     print("  👑  Admin  → arfath / admin123")
     print("  👁   Viewer → demo   / demo123\n")
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=10000, debug=False)
