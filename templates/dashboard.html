@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EMS · Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body class="dash-body">
+
+<!-- ════════════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+
+  <!-- Brand -->
+  <div class="sb-brand">
+    <div class="brand-hex-sm">
+      <svg viewBox="0 0 40 40"><polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="#6366F1"/></svg>
+      <span>E</span>
+    </div>
+    <span class="sb-brand-name">PeopleOS</span>
+    <button class="sb-close" id="sb-close" onclick="toggleSidebar()">✕</button>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sb-nav">
+    <p class="sb-section-label">MAIN MENU</p>
+
+    <a href="#" class="sb-item active" data-view="overview" onclick="switchView('overview', this)">
+      <span class="sb-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      </span>
+      <span>Overview</span>
+    </a>
+
+    <a href="#" class="sb-item" data-view="employees" onclick="switchView('employees', this)">
+      <span class="sb-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </span>
+      <span>Employees</span>
+      <span class="sb-badge" id="sb-emp-count">{{ employees|length }}</span>
+    </a>
+
+    <a href="#" class="sb-item" data-view="add" onclick="openAddModal(); return false;">
+      <span class="sb-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      </span>
+      <span>Add Employee</span>
+    </a>
+
+    <p class="sb-section-label" style="margin-top:28px">SETTINGS</p>
+
+    <a href="/logout" class="sb-item sb-logout">
+      <span class="sb-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </span>
+      <span>Logout</span>
+    </a>
+  </nav>
+
+  <!-- Sidebar footer -->
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">{{ username[0]|upper }}</div>
+      <div>
+        <p class="sb-uname">{{ username }}</p>
+        <p class="sb-urole">Administrator</p>
+      </div>
+    </div>
+  </div>
+
+</aside>
+
+<!-- ════════════════════════════════════════════════════
+     MAIN CONTENT
+════════════════════════════════════════════════════ -->
+<div class="main-area" id="main-area">
+
+  <!-- Top Navbar -->
+  <header class="topnav">
+    <div class="topnav-left">
+      <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topnav-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="global-search" placeholder="Search employees…" oninput="searchEmployees(this.value)"/>
+      </div>
+    </div>
+    <div class="topnav-right">
+      <button class="nav-icon-btn" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="nav-profile">
+        <div class="nav-avatar">{{ username[0]|upper }}</div>
+        <div class="nav-profile-info">
+          <p class="nav-username">{{ username }}</p>
+          <p class="nav-role">Administrator</p>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chevron-icon"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- ════ OVERVIEW VIEW ════ -->
+  <section class="view-section" id="view-overview">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Dashboard Overview</h1>
+        <p class="page-sub">Welcome back, <strong>{{ username }}</strong> — here's what's happening.</p>
+      </div>
+      <button class="btn-primary" onclick="openAddModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Employee
+      </button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="cards-grid">
+      <div class="stat-card" style="--card-accent:#6366F1">
+        <div class="stat-card-top">
+          <div class="stat-icon" style="background:rgba(99,102,241,0.15)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <span class="stat-trend up">+2 this week</span>
+        </div>
+        <p class="stat-number" id="stat-total">{{ total }}</p>
+        <p class="stat-label">Total Employees</p>
+        <div class="stat-bar"><div class="stat-bar-fill" style="width:100%;background:#6366F1"></div></div>
+      </div>
+
+      <div class="stat-card" style="--card-accent:#10B981">
+        <div class="stat-card-top">
+          <div class="stat-icon" style="background:rgba(16,185,129,0.15)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <span class="stat-trend up">Active now</span>
+        </div>
+        <p class="stat-number" id="stat-active">{{ active }}</p>
+        <p class="stat-label">Active Employees</p>
+        <div class="stat-bar"><div class="stat-bar-fill" id="bar-active" style="background:#10B981"></div></div>
+      </div>
+
+      <div class="stat-card" style="--card-accent:#F59E0B">
+        <div class="stat-card-top">
+          <div class="stat-icon" style="background:rgba(245,158,11,0.15)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <span class="stat-trend neutral">Currently away</span>
+        </div>
+        <p class="stat-number" id="stat-leave">{{ on_leave }}</p>
+        <p class="stat-label">On Leave</p>
+        <div class="stat-bar"><div class="stat-bar-fill" id="bar-leave" style="background:#F59E0B"></div></div>
+      </div>
+
+      <div class="stat-card" style="--card-accent:#8B5CF6">
+        <div class="stat-card-top">
+          <div class="stat-icon" style="background:rgba(139,92,246,0.15)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <span class="stat-trend up">Across org</span>
+        </div>
+        <p class="stat-number" id="stat-depts">{{ dept_count }}</p>
+        <p class="stat-label">Departments</p>
+        <div class="stat-bar"><div class="stat-bar-fill" style="width:100%;background:#8B5CF6"></div></div>
+      </div>
+    </div>
+
+    <!-- Recent Employees Table (preview) -->
+    <div class="table-card">
+      <div class="table-card-header">
+        <h2 class="table-card-title">Recent Employees</h2>
+        <button class="link-action" onclick="switchView('employees', document.querySelector('[data-view=employees]'))">
+          View all <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table" id="overview-table">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Department</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for emp in employees[:5] %}
+            <tr class="trow" data-id="{{ emp.id }}">
+              <td>
+                <div class="emp-cell">
+                  <div class="emp-avatar" style="background:{{ ['#6366F1','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4'][loop.index0 % 6] }}">
+                    {{ emp.name[:2]|upper }}
+                  </div>
+                  <div>
+                    <p class="emp-name">{{ emp.name }}</p>
+                    <p class="emp-email">{{ emp.email }}</p>
+                  </div>
+                </div>
+              </td>
+              <td><span class="dept-chip">{{ emp.department }}</span></td>
+              <td>
+                <span class="status-badge status-{{ emp.status|lower|replace(' ','-') }}">
+                  <span class="status-dot"></span>{{ emp.status }}
+                </span>
+              </td>
+              <td>
+                <div class="action-group">
+                  <button class="btn-icon view-btn" onclick="openProfileModal({{ emp.id }})" title="View Profile">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                  {% if role == 'admin' %}
+                  <button class="btn-icon edit-btn" onclick="openEditModal({{ emp.id }})" title="Edit">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button class="btn-icon delete-btn" onclick="deleteEmployee({{ emp.id }}, this)" title="Delete">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                  </button>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="empty-row">No employees yet. Add one!</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section><!-- /overview -->
+
+  <!-- ════ EMPLOYEES VIEW ════ -->
+  <section class="view-section hidden" id="view-employees">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">All Employees</h1>
+        <p class="page-sub" id="emp-count-label">{{ employees|length }} employees total</p>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="filter-select-wrap">
+          <select id="dept-filter" onchange="filterEmployees()">
+            <option value="">All Departments</option>
+            <option>Engineering</option>
+            <option>Design</option>
+            <option>Marketing</option>
+            <option>HR</option>
+            <option>Finance</option>
+            <option>Sales</option>
+            <option>Operations</option>
+          </select>
+        </div>
+        <div class="filter-select-wrap">
+          <select id="status-filter" onchange="filterEmployees()">
+            <option value="">All Statuses</option>
+            <option>Active</option>
+            <option>Inactive</option>
+            <option>On Leave</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="openAddModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Employee
+        </button>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table class="data-table" id="emp-table">
+          <thead>
+            <tr>
+              <th>
+                <label class="checkbox-wrap">
+                  <input type="checkbox" id="select-all" onchange="toggleSelectAll(this)"/>
+                  <span class="checkmark"></span>
+                </label>
+              </th>
+              <th>Employee</th>
+              <th>Department</th>
+              <th>Status</th>
+              <th>ID</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="emp-tbody">
+            {% for emp in employees %}
+            <tr class="trow emp-row" data-id="{{ emp.id }}"
+                data-name="{{ emp.name }}" data-dept="{{ emp.department }}" data-status="{{ emp.status }}">
+              <td>
+                <label class="checkbox-wrap">
+                  <input type="checkbox" class="row-check"/>
+                  <span class="checkmark"></span>
+                </label>
+              </td>
+              <td>
+                <div class="emp-cell">
+                  <div class="emp-avatar" style="background:{{ ['#6366F1','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4'][loop.index0 % 6] }}">
+                    {{ emp.name[:2]|upper }}
+                  </div>
+                  <div>
+                    <p class="emp-name">{{ emp.name }}</p>
+                    <p class="emp-email">{{ emp.email }}</p>
+                  </div>
+                </div>
+              </td>
+              <td><span class="dept-chip">{{ emp.department }}</span></td>
+              <td>
+                <span class="status-badge status-{{ emp.status|lower|replace(' ','-') }}">
+                  <span class="status-dot"></span>{{ emp.status }}
+                </span>
+              </td>
+              <td><span class="id-chip">#{{ '%04d'|format(emp.id) }}</span></td>
+              <td>
+                <div class="action-group">
+                  <button class="btn-icon view-btn" onclick="openProfileModal({{ emp.id }})" title="View Profile">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                  {% if role == 'admin' %}
+                  <button class="btn-icon edit-btn" onclick="openEditModal({{ emp.id }})" title="Edit employee">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button class="btn-icon delete-btn" onclick="deleteEmployee({{ emp.id }}, this)" title="Delete employee">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                  </button>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="empty-row">No employees yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section><!-- /employees -->
+
+</div><!-- /main-area -->
+
+<!-- ════════════════════════════════════════════════════
+     MODAL — Add / Edit Employee
+════════════════════════════════════════════════════ -->
+<div class="modal-backdrop hidden" id="modal-backdrop">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title" id="modal-title">Add New Employee</h2>
+        <p class="modal-sub" id="modal-sub">Fill in the details below</p>
+      </div>
+      <button class="modal-close-btn" onclick="closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <form id="emp-form" class="emp-form" onsubmit="submitForm(event)">
+      <input type="hidden" id="edit-id"/>
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="f-name">Full Name <span class="req">*</span></label>
+          <input type="text" id="f-name" placeholder="e.g. Jane Cooper" required/>
+        </div>
+        <div class="form-field">
+          <label for="f-email">Email Address <span class="req">*</span></label>
+          <input type="email" id="f-email" placeholder="jane@company.com" required/>
+        </div>
+        <div class="form-field">
+          <label for="f-dept">Department <span class="req">*</span></label>
+          <select id="f-dept" required>
+            <option value="">Select department…</option>
+            <option>Engineering</option>
+            <option>Design</option>
+            <option>Marketing</option>
+            <option>HR</option>
+            <option>Finance</option>
+            <option>Sales</option>
+            <option>Operations</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="f-status">Status</label>
+          <select id="f-status">
+            <option>Active</option>
+            <option>Inactive</option>
+            <option>On Leave</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="f-phone">Phone Number</label>
+          <input type="text" id="f-phone" placeholder="+91 98765 43210"/>
+        </div>
+        <div class="form-field">
+          <label for="f-doj">Date of Joining</label>
+          <input type="date" id="f-doj"/>
+        </div>
+        <div class="form-field">
+          <label for="f-salary">Salary (₹)</label>
+          <input type="text" id="f-salary" placeholder="e.g. 75000"/>
+        </div>
+        <div class="form-field" style="grid-column:1/-1">
+          <label for="f-address">Address</label>
+          <input type="text" id="f-address" placeholder="e.g. 123 Main St, Bangalore"/>
+        </div>
+        <!-- Photo upload field -->
+        <div class="form-field" style="grid-column:1/-1">
+          <label for="f-photo">Employee Photo</label>
+          <div class="photo-upload-wrap">
+            <div class="photo-preview-wrap">
+              <div class="photo-preview" id="photo-preview">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+            </div>
+            <div class="photo-upload-info">
+              <label for="f-photo" class="photo-upload-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Choose Photo
+              </label>
+              <input type="file" id="f-photo" name="photo" accept="image/*" style="display:none" onchange="previewPhoto(this)"/>
+              <p class="photo-hint">JPG, PNG, GIF up to 5MB. If no photo, initials avatar will be shown.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-error hidden" id="form-error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="form-error-msg">An error occurred.</span>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-primary" id="form-submit-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span id="submit-label">Save Employee</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     PROFILE MODAL — View Employee Details
+════════════════════════════════════════════════════ -->
+<div class="modal-backdrop hidden" id="profile-backdrop">
+  <div class="modal-box profile-modal-box" id="profile-box">
+
+    <!-- Header with avatar / photo -->
+    <div class="profile-header">
+      <!-- Shows photo if available, otherwise shows initials avatar -->
+      <div class="profile-avatar-big" id="profile-avatar">JD</div>
+      <img id="profile-photo" src="" alt="Employee Photo"
+           class="profile-photo-img hidden"
+           onerror="this.classList.add('hidden'); document.getElementById('profile-avatar').classList.remove('hidden')"/>
+      <div class="profile-header-info">
+        <h2 class="profile-name"  id="profile-name">—</h2>
+        <p class="profile-role"   id="profile-role">—</p>
+        <span class="status-badge" id="profile-status-badge">
+          <span class="status-dot"></span>
+          <span id="profile-status-text">—</span>
+        </span>
+      </div>
+      <button class="modal-close-btn" onclick="closeProfileModal()" style="margin-left:auto;align-self:flex-start">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Detail cards grid -->
+    <div class="profile-details-grid">
+
+      <div class="profile-detail-card">
+        <div class="detail-icon" style="background:rgba(99,102,241,0.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div>
+          <p class="detail-label">Email Address</p>
+          <p class="detail-value" id="profile-email">—</p>
+        </div>
+      </div>
+
+      <div class="profile-detail-card">
+        <div class="detail-icon" style="background:rgba(16,185,129,0.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.1a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.37h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div>
+          <p class="detail-label">Phone Number</p>
+          <p class="detail-value" id="profile-phone">—</p>
+        </div>
+      </div>
+
+      <div class="profile-detail-card">
+        <div class="detail-icon" style="background:rgba(245,158,11,0.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <div>
+          <p class="detail-label">Department</p>
+          <p class="detail-value" id="profile-dept">—</p>
+        </div>
+      </div>
+
+      <div class="profile-detail-card">
+        <div class="detail-icon" style="background:rgba(139,92,246,0.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div>
+          <p class="detail-label">Date of Joining</p>
+          <p class="detail-value" id="profile-doj">—</p>
+        </div>
+      </div>
+
+      <div class="profile-detail-card">
+        <div class="detail-icon" style="background:rgba(6,182,212,0.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div>
+          <p class="detail-label">Salary</p>
+          <p class="detail-value" id="profile-salary">—</p>
+        </div>
+      </div>
+
+      <div class="profile-detail-card" style="grid-column:1/-1">
+        <div class="detail-icon" style="background:rgba(239,68,68,0.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div>
+          <p class="detail-label">Address</p>
+          <p class="detail-value" id="profile-address">—</p>
+        </div>
+      </div>
+
+    </div><!-- /profile-details-grid -->
+
+    <!-- Action buttons -->
+    <div class="profile-actions">
+      <button class="btn-ghost" onclick="closeProfileModal()">Close</button>
+      {% if role == 'admin' %}
+      <button class="btn-primary" id="profile-edit-btn" onclick="closeProfileModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit Employee
+      </button>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     TOAST NOTIFICATION
+════════════════════════════════════════════════════ -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ════════════════════════════════════════════════════
+     DELETE CONFIRM DIALOG
+════════════════════════════════════════════════════ -->
+<div class="modal-backdrop hidden" id="confirm-backdrop">
+  <div class="confirm-box">
+    <div class="confirm-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+    </div>
+    <h3>Delete Employee?</h3>
+    <p id="confirm-msg">This will permanently remove the employee from the system.</p>
+    <div class="confirm-actions">
+      <button class="btn-ghost" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-danger" id="confirm-yes">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pass Jinja data to JS -->
+<script>
+  // Initial employee data from Flask/Jinja (used for client-side filtering)
+  window.EMS_EMPLOYEES = {{ employees | tojson | safe }};
+  window.EMS_ROLE      = '{{ role }}';
+  window.EMS_TOTAL     = {{ total }};
+  window.EMS_ACTIVE    = {{ active }};
+  window.EMS_LEAVE     = {{ on_leave }};
+</script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

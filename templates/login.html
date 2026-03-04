@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>arfath.co · Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body class="login-body">
+
+  <div class="mesh-bg">
+    <div class="mesh-orb orb1"></div>
+    <div class="mesh-orb orb2"></div>
+    <div class="mesh-orb orb3"></div>
+    <div class="noise-overlay"></div>
+  </div>
+  <div class="grid-lines"></div>
+
+  <main class="login-stage">
+
+    <!-- LEFT PANEL — Simple Blob Mascot -->
+    <div class="mascot-panel">
+      <div class="mascot-wrap">
+
+        <!-- BLOBBY — simple cute blob, NOT human -->
+        <svg id="otto" class="otto" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- Shadow -->
+          <ellipse cx="100" cy="222" rx="48" ry="8" fill="rgba(0,0,0,0.18)"/>
+
+          <!-- Antenna -->
+          <line x1="100" y1="16" x2="100" y2="42" stroke="#818CF8" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="100" cy="11" r="9" fill="#6366F1"/>
+          <circle cx="100" cy="11" r="5" fill="#C7D2FE"/>
+
+          <!-- Main blob body -->
+          <g class="head-group" id="head-group">
+            <ellipse cx="100" cy="130" rx="74" ry="80" fill="#6366F1"/>
+            <!-- Inner face -->
+            <ellipse cx="100" cy="116" rx="56" ry="54" fill="#818CF8"/>
+            <!-- Shine -->
+            <ellipse cx="76" cy="82" rx="18" ry="11" fill="rgba(255,255,255,0.18)" transform="rotate(-25,76,82)"/>
+
+            <!-- NORMAL EYES -->
+            <g id="eyes-normal">
+              <circle cx="82"  cy="108" r="15" fill="white"/>
+              <circle cx="82"  cy="108" r="10" fill="#1E293B"/>
+              <circle id="pupil-left"  cx="82"  cy="108" r="5.5" fill="#0F172A"/>
+              <circle cx="86"  cy="103" r="3.5" fill="white"/>
+              <circle cx="118" cy="108" r="15" fill="white"/>
+              <circle cx="118" cy="108" r="10" fill="#1E293B"/>
+              <circle id="pupil-right" cx="118" cy="108" r="5.5" fill="#0F172A"/>
+              <circle cx="122" cy="103" r="3.5" fill="white"/>
+            </g>
+
+            <!-- EYES SHUT -->
+            <g id="eyes-shut" class="hidden">
+              <path d="M70 108 Q82 98 94 108"  stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+              <path d="M106 108 Q118 98 130 108" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            </g>
+
+            <!-- STAR EYES (happy) -->
+            <g id="eyes-happy" class="hidden">
+              <text x="82"  y="117" font-size="20" fill="#FCD34D" text-anchor="middle">&#9733;</text>
+              <text x="118" y="117" font-size="20" fill="#FCD34D" text-anchor="middle">&#9733;</text>
+            </g>
+
+            <!-- Cheeks -->
+            <ellipse cx="66"  cy="126" rx="12" ry="8" fill="#F472B6" opacity="0.38"/>
+            <ellipse cx="134" cy="126" rx="12" ry="8" fill="#F472B6" opacity="0.38"/>
+
+            <!-- EYEBROWS -->
+            <g id="brows">
+              <path d="M70 90 Q82 84 94 90"   stroke="white" stroke-width="3" fill="none" stroke-linecap="round" class="brow-left"/>
+              <path d="M106 90 Q118 84 130 90" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" class="brow-right"/>
+            </g>
+
+            <!-- MOUTHS -->
+            <path id="mouth-smile"   d="M84 132 Q100 148 116 132" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path id="mouth-nervous" d="M87 138 Q100 132 113 138" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round" class="hidden"/>
+            <g id="mouth-happy" class="hidden">
+              <path d="M80 132 Q100 154 120 132" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            </g>
+            <path id="mouth-frown"   d="M84 142 Q100 128 116 142" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round" class="hidden"/>
+
+            <!-- SWEAT DROP -->
+            <g id="sweat" class="hidden">
+              <ellipse cx="152" cy="76" rx="5" ry="7" fill="#93C5FD" opacity="0.9"/>
+              <polygon points="152,62 148,76 156,76" fill="#93C5FD" opacity="0.9"/>
+            </g>
+
+          </g>
+
+          <!-- Normal stub arms -->
+          <ellipse class="arm-l" cx="32"  cy="136" rx="16" ry="11" fill="#818CF8"/>
+          <ellipse class="arm-r" cx="168" cy="136" rx="16" ry="11" fill="#818CF8"/>
+
+          <!-- COVER PAWS (slide up when .covering) -->
+          <g id="cover-hands">
+            <g id="hand-left-cover">
+              <rect x="34" y="112" width="22" height="38" rx="11" fill="#818CF8"/>
+              <circle cx="45" cy="107" r="21" fill="#6366F1"/>
+              <circle cx="29" cy="94"  r="9"  fill="#6366F1"/>
+              <circle cx="45" cy="88"  r="9"  fill="#6366F1"/>
+              <circle cx="61" cy="94"  r="9"  fill="#6366F1"/>
+            </g>
+            <g id="hand-right-cover">
+              <rect x="144" y="112" width="22" height="38" rx="11" fill="#818CF8"/>
+              <circle cx="155" cy="107" r="21" fill="#6366F1"/>
+              <circle cx="139" cy="94"  r="9"  fill="#6366F1"/>
+              <circle cx="155" cy="88"  r="9"  fill="#6366F1"/>
+              <circle cx="171" cy="94"  r="9"  fill="#6366F1"/>
+            </g>
+          </g>
+
+          <!-- Little feet -->
+          <ellipse cx="80"  cy="205" rx="23" ry="14" fill="#4F46E5"/>
+          <ellipse cx="120" cy="205" rx="23" ry="14" fill="#4F46E5"/>
+
+        </svg>
+
+        <div class="mascot-caption">
+          <span id="otto-msg">Hey! Welcome to arfath.co 👋</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL — Login Form -->
+    <div class="form-panel">
+      <div class="form-card">
+
+        <!-- Brand: arfath.co -->
+        <div class="brand-mark">
+          <div class="brand-hexagon">
+            <svg viewBox="0 0 40 40"><polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="#6366F1"/></svg>
+            <span>A</span>
+          </div>
+          <div>
+            <p class="brand-title">arfath.co</p>
+            <p class="brand-sub">Employee Management System</p>
+          </div>
+        </div>
+
+        <h1 class="form-heading">Welcome back</h1>
+        <p class="form-sub">Sign in to your workspace</p>
+
+        <!-- Error banner -->
+        <div class="alert-error hidden" id="alert-error">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="alert-msg">Invalid credentials.</span>
+        </div>
+
+        <form id="login-form" class="login-form" autocomplete="off">
+
+          <div class="field-wrap">
+            <label for="username">Username</label>
+            <div class="input-shell">
+              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <input type="text" id="username" name="username" placeholder="Enter username" autocomplete="off" spellcheck="false" required/>
+            </div>
+          </div>
+
+          <div class="field-wrap">
+            <label for="password">Password</label>
+            <div class="input-shell">
+              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="new-password" required/>
+              <button type="button" class="pw-eye" id="pw-eye" title="Toggle visibility">
+                <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-login" id="btn-login">
+            <span class="btn-text">Sign In</span>
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <span class="btn-spinner hidden" id="btn-spinner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            </span>
+          </button>
+
+        </form>
+        <!-- No demo hint — removed -->
+
+      </div>
+    </div>
+
+  </main>
+
+  <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>
