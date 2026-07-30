@@ -6,7 +6,7 @@
   <title>arfath.co · Sign In</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <link rel="stylesheet" href="/static/css/style.css"/>
 </head>
 <body class="login-body">
 
@@ -156,10 +156,10 @@
         <form id="login-form" class="login-form" autocomplete="off">
 
           <div class="field-wrap">
-            <label for="username">Username</label>
+            <label for="email">Email</label>
             <div class="input-shell">
-              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <input type="text" id="username" name="username" placeholder="Enter username" autocomplete="off" spellcheck="false" required/>
+              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <input type="email" id="email" name="email" placeholder="admin@arfath.co" autocomplete="email" spellcheck="false" required/>
             </div>
           </div>
 
@@ -190,6 +190,6 @@
 
   </main>
 
-  <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+  <script src="/static/js/login.js"></script>
 </body>
 </html>

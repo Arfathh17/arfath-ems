@@ -6,7 +6,7 @@
   <title>EMS · Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <link rel="stylesheet" href="/static/css/style.css"/>
 </head>
 <body class="dash-body">
 
@@ -44,12 +44,14 @@
       <span class="sb-badge" id="sb-emp-count">{{ employees|length }}</span>
     </a>
 
+    {% if role == 'admin' %}
     <a href="#" class="sb-item" data-view="add" onclick="openAddModal(); return false;">
       <span class="sb-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
       </span>
       <span>Add Employee</span>
     </a>
+    {% endif %}
 
     <p class="sb-section-label" style="margin-top:28px">SETTINGS</p>
 
@@ -64,10 +66,10 @@
   <!-- Sidebar footer -->
   <div class="sb-footer">
     <div class="sb-user">
-      <div class="sb-avatar">{{ username[0]|upper }}</div>
+      <div class="sb-avatar">{{ usernameInitial }}</div>
       <div>
         <p class="sb-uname">{{ username }}</p>
-        <p class="sb-urole">Administrator</p>
+        <p class="sb-urole">{{ roleLabel }}</p>
       </div>
     </div>
   </div>
@@ -96,10 +98,10 @@
         <span class="notif-dot"></span>
       </button>
       <div class="nav-profile">
-        <div class="nav-avatar">{{ username[0]|upper }}</div>
+        <div class="nav-avatar">{{ usernameInitial }}</div>
         <div class="nav-profile-info">
           <p class="nav-username">{{ username }}</p>
-          <p class="nav-role">Administrator</p>
+          <p class="nav-role">{{ roleLabel }}</p>
         </div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chevron-icon"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
@@ -113,15 +115,17 @@
         <h1 class="page-title">Dashboard Overview</h1>
         <p class="page-sub">Welcome back, <strong>{{ username }}</strong> — here's what's happening.</p>
       </div>
+      {% if role == 'admin' %}
       <button class="btn-primary" onclick="openAddModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Add Employee
       </button>
+      {% endif %}
     </div>
 
     <!-- Summary Cards -->
     <div class="cards-grid">
-      <div class="stat-card" style="--card-accent:#6366F1">
+      <div class="stat-card" style="--card-accent:#6366F1;cursor:pointer" role="button" tabindex="0" onclick="applySummaryFilter('all')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();applySummaryFilter('all');}">
         <div class="stat-card-top">
           <div class="stat-icon" style="background:rgba(99,102,241,0.15)">
             <svg viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -133,7 +137,7 @@
         <div class="stat-bar"><div class="stat-bar-fill" style="width:100%;background:#6366F1"></div></div>
       </div>
 
-      <div class="stat-card" style="--card-accent:#10B981">
+      <div class="stat-card" style="--card-accent:#10B981;cursor:pointer" role="button" tabindex="0" onclick="applySummaryFilter('active')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();applySummaryFilter('active');}">
         <div class="stat-card-top">
           <div class="stat-icon" style="background:rgba(16,185,129,0.15)">
             <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -145,7 +149,7 @@
         <div class="stat-bar"><div class="stat-bar-fill" id="bar-active" style="background:#10B981"></div></div>
       </div>
 
-      <div class="stat-card" style="--card-accent:#F59E0B">
+      <div class="stat-card" style="--card-accent:#F59E0B;cursor:pointer" role="button" tabindex="0" onclick="applySummaryFilter('leave')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();applySummaryFilter('leave');}">
         <div class="stat-card-top">
           <div class="stat-icon" style="background:rgba(245,158,11,0.15)">
             <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -157,7 +161,7 @@
         <div class="stat-bar"><div class="stat-bar-fill" id="bar-leave" style="background:#F59E0B"></div></div>
       </div>
 
-      <div class="stat-card" style="--card-accent:#8B5CF6">
+      <div class="stat-card" style="--card-accent:#8B5CF6;cursor:pointer" role="button" tabindex="0" onclick="applySummaryFilter('departments')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();applySummaryFilter('departments');}">
         <div class="stat-card-top">
           <div class="stat-icon" style="background:rgba(139,92,246,0.15)">
             <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -189,12 +193,12 @@
             </tr>
           </thead>
           <tbody>
-            {% for emp in employees[:5] %}
+            {% for emp in recentEmployees %}
             <tr class="trow" data-id="{{ emp.id }}">
               <td>
                 <div class="emp-cell">
                   <div class="emp-avatar" style="background:{{ ['#6366F1','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4'][loop.index0 % 6] }}">
-                    {{ emp.name[:2]|upper }}
+                    {{ emp.initials }}
                   </div>
                   <div>
                     <p class="emp-name">{{ emp.name }}</p>
@@ -204,7 +208,7 @@
               </td>
               <td><span class="dept-chip">{{ emp.department }}</span></td>
               <td>
-                <span class="status-badge status-{{ emp.status|lower|replace(' ','-') }}">
+                <span class="status-badge status-{{ emp.statusClass }}">
                   <span class="status-dot"></span>{{ emp.status }}
                 </span>
               </td>
@@ -240,8 +244,9 @@
       <div>
         <h1 class="page-title">All Employees</h1>
         <p class="page-sub" id="emp-count-label">{{ employees|length }} employees total</p>
+        <p class="page-sub" id="emp-filter-summary" style="margin-top:4px;color:#64748b">Showing all employees</p>
       </div>
-      <div style="display:flex;gap:12px;align-items:center">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
         <div class="filter-select-wrap">
           <select id="dept-filter" onchange="filterEmployees()">
             <option value="">All Departments</option>
@@ -262,14 +267,22 @@
             <option>On Leave</option>
           </select>
         </div>
+        {% if role == 'admin' %}
         <button class="btn-primary" onclick="openAddModal()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Add Employee
         </button>
+        {% endif %}
       </div>
     </div>
 
     <div class="table-card">
+      <div class="dept-filter-row" id="dept-filter-chips" style="margin-bottom:14px">
+        <button class="dept-chip-btn active" onclick="applyDepartmentFilter('')">All Departments</button>
+        {% for dept in departments %}
+        <button class="dept-chip-btn" onclick="applyDepartmentFilter('{{ dept }}')">{{ dept }}</button>
+        {% endfor %}
+      </div>
       <div class="table-scroll">
         <table class="data-table" id="emp-table">
           <thead>
@@ -288,6 +301,7 @@
             </tr>
           </thead>
           <tbody id="emp-tbody">
+            <tr id="emp-empty-state" class="empty-row hidden"><td colspan="6">Nothing here — try another filter.</td></tr>
             {% for emp in employees %}
             <tr class="trow emp-row" data-id="{{ emp.id }}"
                 data-name="{{ emp.name }}" data-dept="{{ emp.department }}" data-status="{{ emp.status }}">
@@ -300,7 +314,7 @@
               <td>
                 <div class="emp-cell">
                   <div class="emp-avatar" style="background:{{ ['#6366F1','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4'][loop.index0 % 6] }}">
-                    {{ emp.name[:2]|upper }}
+                    {{ emp.initials }}
                   </div>
                   <div>
                     <p class="emp-name">{{ emp.name }}</p>
@@ -310,11 +324,11 @@
               </td>
               <td><span class="dept-chip">{{ emp.department }}</span></td>
               <td>
-                <span class="status-badge status-{{ emp.status|lower|replace(' ','-') }}">
+                <span class="status-badge status-{{ emp.statusClass }}">
                   <span class="status-dot"></span>{{ emp.status }}
                 </span>
               </td>
-              <td><span class="id-chip">#{{ '%04d'|format(emp.id) }}</span></td>
+              <td><span class="id-chip">{{ emp.idLabel }}</span></td>
               <td>
                 <div class="action-group">
                   <button class="btn-icon view-btn" onclick="openProfileModal({{ emp.id }})" title="View Profile">
@@ -573,13 +587,13 @@
 <!-- Pass Jinja data to JS -->
 <script>
   // Initial employee data from Flask/Jinja (used for client-side filtering)
-  window.EMS_EMPLOYEES = {{ employees | tojson | safe }};
+  window.EMS_EMPLOYEES = {{ employees | dump | safe }};
   window.EMS_ROLE      = '{{ role }}';
   window.EMS_TOTAL     = {{ total }};
   window.EMS_ACTIVE    = {{ active }};
   window.EMS_LEAVE     = {{ on_leave }};
 </script>
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script src="/static/js/script.js"></script>
 
 </body>
 </html>

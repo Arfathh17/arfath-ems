@@ -21,6 +21,8 @@ window.addEventListener("DOMContentLoaded", () => {
     if (barLeave)  barLeave.style.width  = total > 0 ? (leave  / total * 100) + "%" : "0%";
   }, 200);
 
+  applyEmployeeFilter();
+
   document.querySelectorAll(".trow").forEach((row, i) => {
     row.style.opacity   = "0";
     row.style.transform = "translateY(10px)";
@@ -73,12 +75,85 @@ function searchEmployees(query) {
 function filterEmployees() {
   const deptVal   = document.getElementById("dept-filter").value.toLowerCase();
   const statusVal = document.getElementById("status-filter").value.toLowerCase();
-  document.querySelectorAll(".emp-row").forEach(row => {
+  applyEmployeeFilter(deptVal, statusVal);
+}
+
+function applyEmployeeFilter(deptVal = "", statusVal = "") {
+  const rows = Array.from(document.querySelectorAll(".emp-row"));
+  let visibleCount = 0;
+
+  rows.forEach((row) => {
     const dept   = (row.dataset.dept   || "").toLowerCase();
     const status = (row.dataset.status || "").toLowerCase();
     const show   = (!deptVal || dept === deptVal) && (!statusVal || status === statusVal);
     row.style.display = show ? "" : "none";
+    if (show) visibleCount += 1;
   });
+
+  const emptyState = document.getElementById("emp-empty-state");
+  if (emptyState) {
+    emptyState.classList.toggle("hidden", visibleCount > 0);
+  }
+
+  const countLabel = document.getElementById("emp-count-label");
+  const filterLabel = document.getElementById("emp-filter-summary");
+  if (countLabel) {
+    countLabel.textContent = `${visibleCount} employee${visibleCount === 1 ? "" : "s"} shown`;
+  }
+  if (filterLabel) {
+    const parts = [];
+    if (deptVal) parts.push(`${deptVal.charAt(0).toUpperCase()}${deptVal.slice(1)} department`);
+    if (statusVal) parts.push(`${statusVal.charAt(0).toUpperCase()}${statusVal.slice(1)} employees`);
+    filterLabel.textContent = parts.length ? `Filtered by ${parts.join(" and ")}` : "Showing all employees";
+  }
+}
+
+function updateDepartmentChipSelection(activeDept = "") {
+  document.querySelectorAll(".dept-chip-btn").forEach((btn) => {
+    const btnDept = (btn.textContent || "").trim();
+    const isActive = activeDept ? btnDept === activeDept : btnDept === "All Departments";
+    btn.classList.toggle("active", isActive);
+  });
+}
+
+function applyDepartmentFilter(dept) {
+  const deptFilter = document.getElementById("dept-filter");
+  const statusFilter = document.getElementById("status-filter");
+  const selectedDept = dept || "";
+
+  if (deptFilter) deptFilter.value = selectedDept;
+  if (statusFilter) statusFilter.value = "";
+  applyEmployeeFilter(selectedDept.toLowerCase(), "");
+  updateDepartmentChipSelection(selectedDept);
+}
+
+function applySummaryFilter(kind) {
+  const deptFilter = document.getElementById("dept-filter");
+  const statusFilter = document.getElementById("status-filter");
+
+  if (!deptFilter || !statusFilter) return;
+
+  if (kind === "active") {
+    statusFilter.value = "Active";
+    deptFilter.value = "";
+    applyEmployeeFilter("", "active");
+    updateDepartmentChipSelection("");
+  } else if (kind === "leave") {
+    statusFilter.value = "On Leave";
+    deptFilter.value = "";
+    applyEmployeeFilter("", "on leave");
+    updateDepartmentChipSelection("");
+  } else if (kind === "departments") {
+    statusFilter.value = "";
+    deptFilter.value = "";
+    applyEmployeeFilter("", "");
+    updateDepartmentChipSelection("");
+  } else {
+    statusFilter.value = "";
+    deptFilter.value = "";
+    applyEmployeeFilter("", "");
+    updateDepartmentChipSelection("");
+  }
 }
 
 function toggleSelectAll(masterCheckbox) {

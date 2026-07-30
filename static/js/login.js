@@ -18,7 +18,7 @@
   const pupilR      = document.getElementById("pupil-right");
   const ottoMsg     = document.getElementById("otto-msg");
   const pwInput     = document.getElementById("password");
-  const usernameInp = document.getElementById("username");
+  const emailInp    = document.getElementById("email");
   const loginForm   = document.getElementById("login-form");
   const alertBox    = document.getElementById("alert-error");
   const alertMsg    = document.getElementById("alert-msg");
@@ -145,10 +145,10 @@
     }
   });
 
-  // Username focus → greet
-  usernameInp.addEventListener("focus", () => {
+  // Email focus → greet
+  emailInp.addEventListener("focus", () => {
     if (currentState === "idle") {
-      showMsg(["Enter your username 👤", "Who goes there? 🔍"]);
+      showMsg(["Enter your email", "Who goes there?"]);
     }
   });
 
