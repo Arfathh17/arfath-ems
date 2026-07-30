@@ -56,5 +56,4 @@ Create a `.env` file from `.env.example`:
 - `PUT /api/employees/:empId` – update employee
 - `DELETE /api/employees/:empId` – delete employee
 
-## Screenshots
-Add screenshots here once the UI is captured.
+
